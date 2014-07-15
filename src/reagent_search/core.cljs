@@ -4,7 +4,8 @@
             [cljs.core.async :refer [put! chan <!]]
             [reagent-search.simple :as simple]
             [reagent-search.navbar :as navbar]
-            [reagent-search.logger :as slogger]))
+            [reagent-search.logger :as slogger]
+            [reagent-search.search :as search]))
 
 (enable-console-print!)
 
@@ -21,11 +22,19 @@
 (def logger-props (atom {:chan-log (chan)
                          :height "125px"}))
 
+(def search-props (atom
+                   {:chan-keyboard (chan)
+                    :chan-query (chan)
+                    :placeholder-text "Type search here"
+                    :button-label "Search"}))
+
 ;; pass in navbar data as properties as the data and navbar is immutable
 (navbar/mount-navbar "navbar" @navbar-props)
 
 ;; pass in logger data as properties since the log channel is ummutable
 (slogger/mount-logger "logger" @logger-props)
+
+(search/mount-search "search" @search-props)
 
 ;; test logger
 (put! (:chan-log @logger-props) (str "message: " (rand-int 100)))
