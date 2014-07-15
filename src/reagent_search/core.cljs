@@ -20,11 +20,15 @@
 
 (def logger-props (atom {:chan-log (chan)
                          :height "125px"}))
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
 
-(println (foo "ed3-"))
 (navbar/mount-navbar "navbar" @navbar-props)
 (slogger/mount-logger "logger" @logger-props)
+
+;; test logger
+(put! (:chan-log @logger-props) (str "message: " (rand-int 100)))
+
+;; test sub-menu
+(swap! navbar-props
+       update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 10)) :url "#"})
+;; why does the logger update real-time but the menu does not?
+;; should the state be passed as an atom if changes need to be rendered?
