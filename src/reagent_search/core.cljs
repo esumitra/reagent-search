@@ -21,14 +21,20 @@
 (def logger-props (atom {:chan-log (chan)
                          :height "125px"}))
 
+;; pass in navbar data as properties as the data and navbar is immutable
 (navbar/mount-navbar "navbar" @navbar-props)
+
+;; pass in logger data as properties since the log channel is ummutable
 (slogger/mount-logger "logger" @logger-props)
 
 ;; test logger
 (put! (:chan-log @logger-props) (str "message: " (rand-int 100)))
 
-;; test sub-menu
-(swap! navbar-props
+;; test sub-menu; will not work unless navbar is driven off local state since props are immutable
+#_(swap! navbar-props
        update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 10)) :url "#"})
+
 ;; why does the logger update real-time but the menu does not?
 ;; should the state be passed as an atom if changes need to be rendered?
+;; since the navbar is rendered from react properties, the view does not change as properties are immutable
+;; since the log panel messages are driven from react local state, modfying the state modifies the view
