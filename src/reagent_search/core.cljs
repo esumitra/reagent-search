@@ -28,7 +28,8 @@
                     :chan-log (:chan-log @logger-props)
                     :placeholder-text "Type search here"
                     :button-label "Search"
-                    :sample-timeout-ms 500}))
+                    :sample-timeout-ms 1000
+                    :autocomplete-size 4}))
 
 ;; pass in navbar data as properties as the data and navbar is immutable
 (navbar/mount-navbar "navbar" @navbar-props)

@@ -20,5 +20,5 @@ goog.addDependency("../reagent_search/utils.js", ['reagent_search.utils'], ['clj
 goog.addDependency("../reagent_search/simple.js", ['reagent_search.simple'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/logger.js", ['reagent_search.logger'], ['reagent_search.utils', 'cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/navbar.js", ['reagent_search.navbar'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
-goog.addDependency("../reagent_search/search.js", ['reagent_search.search'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
+goog.addDependency("../reagent_search/search.js", ['reagent_search.search'], ['reagent_search.utils', 'cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/core.js", ['reagent_search.core'], ['cljs.core', 'reagent_search.simple', 'clojure.string', 'cljs.core.async', 'reagent_search.logger', 'reagent_search.navbar', 'reagent_search.search']);
