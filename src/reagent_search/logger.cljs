@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [clojure.string :as string]
             [cljs.core.async :refer [put! chan <!]]
-            [reagent.core :as reagent :refer [atom]]))
+            [reagent.core :as reagent :refer [atom]]
+            [reagent-search.utils :as utils]))
 
 ;; logger has a local state that contains
 ;; all the messages logged so far
@@ -13,7 +14,7 @@
   [props]
   (let [logger (:chan-log props (chan))
         height (:height props "25px")
-        messages (atom ["no messages"])]
+        messages (atom ["messages will be logged here"])]
     ;; mount function to log messages in log channel
     (go (loop []
           (let [new-message (<! logger)]
@@ -26,7 +27,7 @@
         [:div.panel.panel-default
          [:div.panel-body.logger
           (for [m @messages]
-            ^{:key (rand-int 5000)} [:span.text-muted m [:br]])]]]])))
+            ^{:key (utils/uuid)} [:span.text-muted m [:br]])]]]])))
 
 (defn mount-logger
   "mounts the logger component with data props at dom-id"

@@ -16,8 +16,9 @@ goog.addDependency("../cljs/core/async/impl/dispatch.js", ['cljs.core.async.impl
 goog.addDependency("../cljs/core/async/impl/channels.js", ['cljs.core.async.impl.channels'], ['cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async/impl/timers.js", ['cljs.core.async.impl.timers'], ['cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async.js", ['cljs.core.async'], ['cljs.core.async.impl.ioc_helpers', 'cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols', 'cljs.core.async.impl.timers']);
+goog.addDependency("../reagent_search/utils.js", ['reagent_search.utils'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/simple.js", ['reagent_search.simple'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
-goog.addDependency("../reagent_search/logger.js", ['reagent_search.logger'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
+goog.addDependency("../reagent_search/logger.js", ['reagent_search.logger'], ['reagent_search.utils', 'cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/navbar.js", ['reagent_search.navbar'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/search.js", ['reagent_search.search'], ['cljs.core', 'reagent.core', 'clojure.string', 'cljs.core.async']);
 goog.addDependency("../reagent_search/core.js", ['reagent_search.core'], ['cljs.core', 'reagent_search.simple', 'clojure.string', 'cljs.core.async', 'reagent_search.logger', 'reagent_search.navbar', 'reagent_search.search']);

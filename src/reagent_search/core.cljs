@@ -25,6 +25,7 @@
 (def search-props (atom
                    {:chan-keyboard (chan)
                     :chan-query (chan)
+                    :chan-log (:chan-log @logger-props)
                     :placeholder-text "Type search here"
                     :button-label "Search"}))
 
@@ -37,13 +38,12 @@
 (search/mount-search "search" @search-props)
 
 ;; test logger
-(put! (:chan-log @logger-props) (str "message: " (rand-int 100)))
+#_(put! (:chan-log @logger-props) (str "message: " (rand-int 100)))
 
 ;; test sub-menu; will not work unless navbar is driven off local state since props are immutable
 #_(swap! navbar-props
        update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 10)) :url "#"})
 
 ;; why does the logger update real-time but the menu does not?
-;; should the state be passed as an atom if changes need to be rendered?
 ;; since the navbar is rendered from react properties, the view does not change as properties are immutable
 ;; since the log panel messages are driven from react local state, modfying the state modifies the view
