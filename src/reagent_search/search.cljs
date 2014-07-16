@@ -18,15 +18,13 @@
   and a selected item channel
   the number of items rendered is limited to size items"
   [size itemsref chan-selecteditems]
-  (let [items itemsref]
-  (fn []
-  (if-not (empty? @items)
+  (if-not (empty? @itemsref)
     [:div.open.dropdown-toggle {:data-toggle "dropdown"}
      [:ul.dropdown-menu
       {:role "menu"}
-      (for [item (reverse (take size @items))]
+      (for [item (reverse (take size @itemsref))]
         ^{:key (utils/uuid)} [autocomplete-item item])]]
-    [:div.close]))))
+    [:div.close]))
 
 ;;; search input box and component
 (defn- handle-querystream
