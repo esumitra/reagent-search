@@ -6,7 +6,6 @@
             [reagent-search.utils :as utils]))
 
 ;;; autocomplete panel
-
 (defn- autocomplete-item
   "renders a single autocomplete item in list"
   [chan-selecteditems item]
