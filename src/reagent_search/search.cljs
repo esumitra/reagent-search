@@ -9,21 +9,39 @@
 
 (defn- autocomplete-item
   "renders a single autocomplete item in list"
-  [item]
+  [chan-selecteditems item]
   [:li
-   [:a {:href ""} item]])
+   [:a {
+        :href ""
+        :on-click #(put! chan-selecteditems item)}
+    item]])
+
+(defn- handle-autocompleteitemselected
+  "handles autocomplete item selected by
+  1. logging selected item
+  2. resetting the text input value
+  3. removing the autocomplete panel"
+  [chan-selecteditems ref-items ref-textvalue]
+  (go-loop
+   []
+   (let [sel (<! chan-selecteditems)]
+     (reset! ref-textvalue sel)
+     (reset! ref-items []))
+   (recur)))
 
 (defn- autocomplete-component
   "renders the autocomplete component given a list of items to display
   and a selected item channel
   the number of items rendered is limited to size items"
-  [size itemsref chan-selecteditems]
+  [size itemsref textvalue chan-selecteditems]
   (if-not (empty? @itemsref)
+    (do
+    (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
     [:div.open.dropdown-toggle {:data-toggle "dropdown"}
      [:ul.dropdown-menu
       {:role "menu"}
       (for [item (reverse (take size @itemsref))]
-        ^{:key (utils/uuid)} [autocomplete-item item])]]
+        ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems item])]])
     [:div.close]))
 
 ;;; search input box and component
@@ -64,11 +82,27 @@
      (put! chan-sampler text)
      (recur))))
 
+(defn- handle-keystream
+  "responds to keyboard stream and handles the down,escape and return keys"
+  [chan-keys chan-log textvalue autocomplete-items]
+  (go-loop
+   []
+   (let [k (<! chan-keys)]
+     (case k
+       13 (do
+            (println "enter pressed")
+            (reset! autocomplete-items []))
+       40 (do
+            (println "keydown pressed"))
+       nil))
+   (recur)))
+
 (defn- search-component
   "renders the search input box"
   [props]
   (let [chan-query (chan)
         chan-textvalue (chan)
+        chan-keys (chan)
         chan-sampler (chan (sliding-buffer 1))
         textvalue (atom "")
         chan-log (:chan-log props)
@@ -77,15 +111,17 @@
     (handle-textvaluestream chan-textvalue chan-sampler chan-log textvalue)
     (handle-samplerstream chan-sampler chan-query chan-log (:sample-timeout-ms props))
     (handle-querystream chan-query autocomplete-items)
+    (handle-keystream chan-keys chan-log textvalue autocomplete-items)
     (fn[]
       [:div.input-group
        [:input.form-control
         {:type "text"
          :placeholder (:placeholder-text props)
          :value @textvalue
-         :on-change #(put! chan-textvalue (-> % .-target .-value))}]
+         :on-change #(put! chan-textvalue (-> % .-target .-value))
+         :on-key-up #(put! chan-keys (-> % .-which))}]
        [:span.input-group-addon.glyphicon.glyphicon-search]
-       [autocomplete-component (:autocomplete-size props) autocomplete-items chan-selecteditems]])))
+       [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems]])))
 
 (defn mount-search
   "mounts the search component with data props at dom-id"
