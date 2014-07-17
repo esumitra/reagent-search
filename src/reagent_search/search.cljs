@@ -3,7 +3,8 @@
   (:require [clojure.string :as string]
             [cljs.core.async :refer [put! chan <! timeout sliding-buffer]]
             [reagent.core :as reagent :refer [atom]]
-            [reagent-search.utils :as utils]))
+            [reagent-search.utils :as utils]
+            [reagent-search.solr :as solr]))
 
 ;;; autocomplete panel
 (defn- autocomplete-item
@@ -50,8 +51,8 @@
   (go-loop
    []
    (let [q (<! chan-query)]
-     (println "query: " q)
-     (swap! ac-items #(cons %2 %1) q))
+     (solr/get-autocomplete-terms q ac-items)
+     #_(swap! ac-items #(cons %2 %1) q))
    (recur)))
 
 (defn- handle-samplerstream

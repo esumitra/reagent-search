@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [clojure.string :as string]
             [cljs.core.async :refer [put! chan <!]]
-            [reagent.core :as reagent :refer [atom]]))
+            [reagent.core :as reagent :refer [atom]]
+            [ajax.core :refer [GET POST]]))
 
 ;; see http://catamorphic.wordpress.com/2012/03/02/generating-a-random-uuid-in-clojurescript/
 ;; and http://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29
@@ -17,3 +18,14 @@
                        (take 3 (drop 15 r)) ["-"]
                        (take 12 (drop 18 r))))))
 
+
+(defn ajax-get
+  "returns a channel with the result of the json request to uri with a map of pars parameters
+  channel entries are of the form {:success true/false :response response/error-text}"
+  [url pars]
+  (let [out (chan)]
+    (GET url
+         {:params pars
+          :handler #(put! out {:success true :response %})
+          :error-handler #(put! out {:success false :response %2})})
+    out))
