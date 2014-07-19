@@ -4,6 +4,7 @@
             [cljs.core.async :refer [put! chan <! timeout sliding-buffer]]
             [reagent.core :as reagent :refer [atom]]
             [reagent-search.utils :as utils]
+            [reagent-search.logger :as slogger]
             [reagent-search.solr :as solr]))
 
 ;;; autocomplete panel
@@ -63,7 +64,7 @@
    (<! (timeout timeoutms))
    (let [sampled-text (<! chan-sampler)
          logmsg (str "sampled text: " sampled-text)]
-     (put! chan-log logmsg)
+     (slogger/info-message chan-log logmsg)
      (put! chan-query sampled-text))
    (recur)))
 
@@ -78,7 +79,7 @@
    (let [text (<! chan-textvalue)
          logtext (str "input text: " text)]
      (reset! textvalue text)
-     (put! chan-log logtext)
+     (slogger/debug-message chan-log logtext)
      (put! chan-sampler text)
      (recur))))
 
@@ -90,10 +91,10 @@
    (let [k (<! chan-keys)]
      (case k
        13 (do
-            (println "enter pressed")
+            (slogger/debug-message chan-log "enter key pressed")
             (reset! autocomplete-items []))
        40 (do
-            (println "keydown pressed"))
+            (slogger/debug-message chan-log "down key pressed"))
        nil))
    (recur)))
 

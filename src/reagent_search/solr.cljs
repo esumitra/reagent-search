@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [clojure.string :as string]
             [cljs.core.async :refer [put! chan <! map<]]
-            [reagent-search.utils :as utils]))
+            [reagent-search.utils :as utils]
+            [reagent-search.logger :as slogger]))
 
 (def solr-search-params
   {:q nil

@@ -39,9 +39,6 @@
 
 (search/mount-search "search" @search-props)
 
-;; test logger
-#_(put! (:chan-log @logger-props) (str "message: " (rand-int 100)))
-
 ;; test sub-menu; will not work unless navbar is driven off local state since props are immutable
 #_(swap! navbar-props
        update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 10)) :url "#"})
@@ -49,3 +46,9 @@
 ;; why does the logger update real-time but the menu does not?
 ;; since the navbar is rendered from react properties, the view does not change as properties are immutable
 ;; since the log panel messages are driven from react local state, modfying the state modifies the view
+
+;; test logger
+#_(slogger/info-message (:chan-log @logger-props) "test")
+#_(slogger/error-message (:chan-log @logger-props) "test")
+#_(slogger/debug-message (:chan-log @logger-props) "test")
+#_(slogger/server-message (:chan-log @logger-props) "test")
