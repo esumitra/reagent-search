@@ -50,9 +50,9 @@
   [chan-query ac-items]
   (go-loop
    []
-   (let [q (<! chan-query)]
-     (solr/get-autocomplete-terms q ac-items)
-     #_(swap! ac-items #(cons %2 %1) q))
+   (let [q (<! chan-query)
+         autocomplete-terms (<! (solr/get-autocomplete-terms q ac-items))]
+     (reset! ac-items autocomplete-terms))
    (recur)))
 
 (defn- handle-samplerstream
