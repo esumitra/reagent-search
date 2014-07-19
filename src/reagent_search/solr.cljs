@@ -18,7 +18,7 @@
 
 (defn get-autocomplete-terms
   "returns a channel that will contain the autocomplete items for term from server"
-  [term-query autocomplete-ref]
+  [term-query]
   (let [parms (merge solr-search-params {:q term-query :terms.prefix term-query})
         chan-result (utils/ajax-get solr-autocomplete-url parms)]
     (map< #(if (:success %)

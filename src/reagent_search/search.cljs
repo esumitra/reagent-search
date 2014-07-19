@@ -48,11 +48,14 @@
 ;;; search input box and component
 (defn- handle-querystream
   "gets autocomplete data from query"
-  [chan-query ac-items]
+  [chan-query chan-log ac-items]
   (go-loop
    []
    (let [q (<! chan-query)
-         autocomplete-terms (<! (solr/get-autocomplete-terms q ac-items))]
+         autocomplete-terms (<! (solr/get-autocomplete-terms q))]
+     (if (= ["error"] autocomplete-terms)
+       (slogger/error-message chan-log "server error")
+       (slogger/server-message chan-log (str autocomplete-terms)))
      (reset! ac-items autocomplete-terms))
    (recur)))
 
@@ -111,7 +114,7 @@
         chan-selecteditems (chan)]
     (handle-textvaluestream chan-textvalue chan-sampler chan-log textvalue)
     (handle-samplerstream chan-sampler chan-query chan-log (:sample-timeout-ms props))
-    (handle-querystream chan-query autocomplete-items)
+    (handle-querystream chan-query chan-log autocomplete-items)
     (handle-keystream chan-keys chan-log textvalue autocomplete-items)
     (fn[]
       [:div.input-group
