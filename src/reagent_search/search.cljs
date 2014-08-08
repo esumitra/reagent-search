@@ -5,7 +5,8 @@
             [reagent.core :as reagent :refer [atom]]
             [reagent-search.utils :as utils]
             [reagent-search.logger :as slogger]
-            [reagent-search.solr :as solr]))
+            [reagent-search.solr :as solr]
+            [reagent-search.wiki :as wiki]))
 
 ;;; autocomplete panel
 (defn- autocomplete-item
@@ -52,7 +53,7 @@
   (go-loop
    []
    (let [q (<! chan-query)
-         autocomplete-terms (<! (solr/get-autocomplete-terms q))]
+         autocomplete-terms (<! (wiki/get-autocomplete-terms q))]
      (if (= ["error"] autocomplete-terms)
        (slogger/error-message chan-log "server error")
        (slogger/server-message chan-log (str autocomplete-terms)))

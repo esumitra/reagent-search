@@ -48,7 +48,7 @@
 ;; since the log panel messages are driven from react local state, modfying the state modifies the view
 
 ;; test logger
-#_(slogger/info-message (:chan-log @logger-props) "test")
+#_(slogger/info-message (:chan-log @logger-props) (str "test " (rand-int 10)))
 #_(slogger/error-message (:chan-log @logger-props) "test")
 #_(slogger/debug-message (:chan-log @logger-props) "test")
 #_(slogger/server-message (:chan-log @logger-props) "test")
