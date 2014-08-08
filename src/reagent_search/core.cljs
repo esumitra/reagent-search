@@ -13,7 +13,7 @@
                    {:name "CLJS-React"
                     :url "#"
                     :items [{:name "Home" :url "#"}
-                            {:name "Contacts" :url "#contacts"}
+                            {:name "Wikipedia" :url "#contacts"}
                             {:name "Solr Search" :url "#search"}
                             {:name "Dropdown" :url "#"
                              :items [{:name "Action" :url "#"}
@@ -42,10 +42,6 @@
 ;; test sub-menu; will not work unless navbar is driven off local state since props are immutable
 #_(swap! navbar-props
        update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 10)) :url "#"})
-
-;; why does the logger update real-time but the menu does not?
-;; since the navbar is rendered from react properties, the view does not change as properties are immutable
-;; since the log panel messages are driven from react local state, modfying the state modifies the view
 
 ;; test logger
 #_(slogger/info-message (:chan-log @logger-props) (str "test " (rand-int 10)))
