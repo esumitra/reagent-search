@@ -26,10 +26,10 @@
                    {:chan-keyboard (chan)
                     :chan-query (chan)
                     :chan-log (:chan-log @logger-props)
-                    :placeholder-text "Type search here"
+                    :placeholder-text "The chicken fell off the roof"
                     :button-label "Search"
                     :sample-timeout-ms 1000
-                    :autocomplete-size 4}))
+                    :autocomplete-size 5}))
 
 ;; pass in navbar data as properties as the data and navbar is immutable
 (navbar/mount-navbar "navbar" @navbar-props)
