@@ -20,4 +20,11 @@
                 :output-to "reagent_search.js"
                 :output-dir "out"
                 :optimizations :none
-                :source-map true}}]})
+                :source-map true}}
+             {:id "reagent-search-min"
+              :source-paths ["src"]
+              :compiler {
+                :output-to "reagent_search.min.js"
+                :output-dir "out-min"
+                :optimizations :advanced
+                :source-map "maze1.min.js.map"}}]})
