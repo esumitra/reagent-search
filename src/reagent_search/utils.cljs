@@ -29,3 +29,21 @@
           :handler #(put! out {:success true :response %})
           :error-handler #(put! out {:success false :response %2})})
     out))
+
+(defn key-code
+  "returns keycode for key event
+  key codes:
+  :u - up key
+  :d - down key
+  :enter - enter key
+  :esc - escape key
+  all other keys return escape values
+  e.g., :on-key-up #(put! mychan (key-code %))"
+  [key-event]
+  (let [keycode (-> key-event .-which)]
+    (condp = keycode
+      38 :u
+      40 :d
+      13 :enter
+      27 :esc
+      keycode)))

@@ -51,9 +51,9 @@
       [:span.icon-bar]
       [:span.icon-bar]
       [:span.icon-bar]]
-     [:a.navbar-brand {:href (:url props)}
+     [:a.navbar-brand {:href (:url @props)}
       (:name props)]]
-    [menu-items-container (:items props)]]])
+    [menu-items-container (:items @props)]]])
 
 (defn mount-navbar
   "mounts the navbar component with data props at dom-id"

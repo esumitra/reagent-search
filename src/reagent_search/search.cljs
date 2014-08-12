@@ -11,7 +11,7 @@
 ;;; autocomplete panel
 (defn- autocomplete-item
   "renders a single autocomplete item in list"
-  [chan-selecteditems item]
+  [chan-selecteditems chan-focus item focus-item]
   [:li
    [:a {
         :href ""
@@ -31,20 +31,39 @@
      (reset! ref-items []))
    (recur)))
 
+(defn- handle-autocomplete-focus
+  "handles keyboard autocomplete focus events
+  focus events are :u - up, :d down, all other events are ignored"
+  [chan-focus ref-items ref-focus-item]
+  (go-loop
+   []
+   (let [fevent (<! chan-focus)
+         new-findex (condp = fevent
+                      :u (dec @ref-focus-item)
+                      :d (inc @ref-focus-item)
+                      -1)
+         new-fval (get (vec @ref-items) new-findex)]
+     (println "items: " @ref-items)
+     (println "new fval:" new-fval ", new-findex: " new-findex)
+     (recur))))
+
 (defn- autocomplete-component
   "renders the autocomplete component given a list of items to display
   and a selected item channel
   the number of items rendered is limited to size items"
-  [size itemsref textvalue chan-selecteditems]
-  (if-not (empty? @itemsref)
-    (do
-    (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
-    [:div.open.dropdown-toggle {:data-toggle "dropdown"}
-     [:ul.dropdown-menu
-      {:role "menu"}
-      (for [item (reverse (take size @itemsref))]
-        ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems item])]])
-    [:div.close]))
+  [size itemsref textvalue chan-selecteditems chan-focus]
+  (let [ref-focus-item (atom -1)]
+    (fn []
+      (if-not (empty? @itemsref)
+        (do
+        (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
+        (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
+        [:div.open.dropdown-toggle {:data-toggle "dropdown"}
+         [:ul.dropdown-menu
+          {:role "menu"}
+          (for [item (take size @itemsref)]
+            ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems chan-focus item ref-focus-item])]])
+        [:div.close]))))
 
 ;;; search input box and component
 (defn- handle-querystream
@@ -53,7 +72,7 @@
   (go-loop
    []
    (let [q (<! chan-query)
-         autocomplete-terms (<! (wiki/get-autocomplete-terms q))]
+         autocomplete-terms (<! (solr/get-autocomplete-terms q))]
      (if (= ["error"] autocomplete-terms)
        (slogger/error-message chan-log "server error")
        (slogger/server-message chan-log (str autocomplete-terms)))
@@ -89,7 +108,7 @@
 
 (defn- handle-keystream
   "responds to keyboard stream and handles the down,escape and return keys"
-  [chan-keys chan-log textvalue autocomplete-items]
+  [chan-keys chan-focus chan-log textvalue autocomplete-items]
   (go-loop
    []
    (let [k (<! chan-keys)]
@@ -98,7 +117,8 @@
             (slogger/debug-message chan-log "enter key pressed")
             (reset! autocomplete-items []))
        40 (do
-            (slogger/debug-message chan-log "down key pressed"))
+            (slogger/debug-message chan-log "down key pressed")
+            (put! chan-focus :d))
        nil))
    (recur)))
 
@@ -112,11 +132,12 @@
         textvalue (atom "")
         chan-log (:chan-log props)
         autocomplete-items (atom [])
-        chan-selecteditems (chan)]
+        chan-selecteditems (chan)
+        chan-focus (chan)]
     (handle-textvaluestream chan-textvalue chan-sampler chan-log textvalue)
     (handle-samplerstream chan-sampler chan-query chan-log (:sample-timeout-ms props))
     (handle-querystream chan-query chan-log autocomplete-items)
-    (handle-keystream chan-keys chan-log textvalue autocomplete-items)
+    (handle-keystream chan-keys chan-focus chan-log textvalue autocomplete-items)
     (fn[]
       [:div.input-group
        [:input.form-control
@@ -126,7 +147,7 @@
          :on-change #(put! chan-textvalue (-> % .-target .-value))
          :on-key-up #(put! chan-keys (-> % .-which))}]
        [:span.input-group-addon.glyphicon.glyphicon-search]
-       [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems]])))
+       [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus]])))
 
 (defn mount-search
   "mounts the search component with data props at dom-id"
