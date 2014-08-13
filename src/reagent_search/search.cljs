@@ -45,6 +45,8 @@
          new-fval (get (vec @ref-items) new-findex)]
      (println "items: " @ref-items)
      (println "new fval:" new-fval ", new-findex: " new-findex)
+     (if (not (nil? new-fval))
+       (reset! ref-focus-item new-findex))
      (recur))))
 
 (defn- autocomplete-component
@@ -53,11 +55,14 @@
   the number of items rendered is limited to size items"
   [size itemsref textvalue chan-selecteditems chan-focus]
   (let [ref-focus-item (atom -1)]
+        (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
+        (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
     (fn []
       (if-not (empty? @itemsref)
         (do
-        (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
-        (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
+        ;; (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
+        ;; (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
+          (reset! ref-focus-item -1)
         [:div.open.dropdown-toggle {:data-toggle "dropdown"}
          [:ul.dropdown-menu
           {:role "menu"}
