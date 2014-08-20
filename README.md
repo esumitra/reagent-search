@@ -52,11 +52,14 @@ The page is a collection of components mounted at the DOM ids defined in the HTM
 The demo is available at [Reagent Demo](http://esumitra.github.io/reagent-search)
 
 ## Wait! What about MVC or my favorite MV* pattern?
-True to its name, React and consequently Reagent, is better suited to the FRP style of building applications and not the typical MVC model.
+True to its name, React and consequently Reagent, is better suited to the [FRP](http://en.wikipedia.org/wiki/Functional_reactive_programming) style of building applications and not the typical MVC model. Instead of global controllers managing the interactions between models and views in a typical MVC application, the application in React/Reagent is a set of global components that interact with each other through asynchronous messages to channels.
+
+Another way to view reagent components is that model, controllers and views are all local to the component. This gives the advantages of good code modularity and composability as components can be composed of other components while also seperating the behaviors from rendering and model/state transitions (**not expressed clearly**). While one can still use the MVC pattern at a highler level of abstraction, using an MVC pattern is not strictly necessary using an FRP programming style.
 
 ## License
 
 Copyright © 2014 Edward Sumitra
 
 Distributed under the Eclipse Public License version 1.0.
+
 
