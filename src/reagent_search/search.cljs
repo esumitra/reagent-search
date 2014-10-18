@@ -77,7 +77,7 @@
   (go-loop
    []
    (let [q (<! chan-query)
-         autocomplete-terms (<! (solr/get-autocomplete-terms q))]
+         autocomplete-terms (<! (wiki/get-autocomplete-terms q))]
      (if (= ["error"] autocomplete-terms)
        (slogger/error-message chan-log "server error")
        (slogger/server-message chan-log (str autocomplete-terms)))

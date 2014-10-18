@@ -41,7 +41,7 @@
 (search/mount-search "search" @search-props)
 
 ;; test sub-menu
-#_(swap! navbar-props
+(swap! navbar-props
        update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 100)) :url "#"})
 
 ;; test logger
