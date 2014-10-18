@@ -25,7 +25,8 @@
   [url pars]
   (let [out (chan)]
     (GET url
-         {:params pars
+         {:headers {"Content-Type" "text/plain"}
+          :params pars
           :handler #(put! out {:success true :response %})
           :error-handler #(put! out {:success false :response %2})})
     out))
