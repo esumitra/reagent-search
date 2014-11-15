@@ -22,13 +22,15 @@
   "handles autocomplete item selected by
   1. logging selected item
   2. resetting the text input value
-  3. removing the autocomplete panel"
-  [chan-selecteditems ref-items ref-textvalue]
+  3. removing the autocomplete panel
+  4. logs the selected component"
+  [chan-selecteditems ref-items ref-textvalue chan-log]
   (go-loop
    []
    (let [sel (<! chan-selecteditems)]
      (reset! ref-textvalue sel)
-     (reset! ref-items []))
+     (reset! ref-items [])
+     (slogger/info-message chan-log (str "selected value:" sel)))
    (recur)))
 
 (defn- handle-autocomplete-focus
@@ -53,9 +55,9 @@
   "renders the autocomplete component given a list of items to display
   and a selected item channel
   the number of items rendered is limited to size items"
-  [size itemsref textvalue chan-selecteditems chan-focus]
+  [size itemsref textvalue chan-selecteditems chan-focus chan-log]
   (let [ref-focus-item (atom -1)]
-        (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
+        (handle-autocompleteitemselected chan-selecteditems itemsref textvalue chan-log)
         (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
     (fn []
       (if-not (empty? @itemsref)
@@ -152,7 +154,21 @@
          :on-change #(put! chan-textvalue (-> % .-target .-value))
          :on-key-up #(put! chan-keys (-> % .-which))}]
        [:span.input-group-addon.glyphicon.glyphicon-search]
-       [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus]])))
+       [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus chan-log]])))
+
+;; how to model behavior of search results?
+;; typeahead component sends search query message to search-query channel
+;; local handler listens to search-query-channel and updates local state
+;; component localstate:
+;; search-query - selected search query
+;; search-results - list of results for search query
+(defn- search-results
+  "renders search results"
+  [chan-search-query]
+  (let [query-term (atom "No Search Query")
+        query-result (atom [])]
+    )
+  )
 
 (defn mount-search
   "mounts the search component with data props at dom-id"
