@@ -37,7 +37,7 @@
       (for [item items]
         ^{:key (:name item)} [menu-item item])]]))
 
-(defn- navbar-component
+(defn navbar-component
   "renders a navbar for input props"
   [props]
   [:div {:className "navbar navbar-default navbar-fixed-top"
@@ -54,10 +54,3 @@
      [:a.navbar-brand {:href (:url @props)}
       (:name props)]]
     [menu-items-container (:items @props)]]])
-
-(defn mount-navbar
-  "mounts the navbar component with data props at dom-id"
-  [dom-id props]
-  (reagent/render-component
-   [navbar-component props]
-   (.getElementById js/document dom-id)))

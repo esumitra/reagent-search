@@ -5,6 +5,7 @@
             [cljs.core.async :refer [put! chan <!]]
             [reagent-search.simple :as simple]
             [reagent-search.navbar :as navbar]
+            [reagent-search.utils :as utils]
             [reagent-search.logger :as slogger]
             [reagent-search.search :as search]))
 
@@ -32,23 +33,11 @@
                     :sample-timeout-ms 1000
                     :autocomplete-size 5}))
 
-;; pass in navbar data as properties as the data and navbar is immutable
-(navbar/mount-navbar "navbar" navbar-props)
-
-;; pass in logger data as properties since the log channel is ummutable
-(slogger/mount-logger "logger" @logger-props)
-
-(search/mount-search "search" @search-props)
+;; mount all components in DOM
+(utils/mount-component navbar/navbar-component navbar-props "navbar")
+(utils/mount-component slogger/logger-component @logger-props "logger")
+(utils/mount-component search/search-component @search-props "search")
 
 ;; test sub-menu
-(swap! navbar-props
-       update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 100)) :url "#"})
-
-;; test logger
-#_(slogger/info-message (:chan-log @logger-props) (str "test " (rand-int 10)))
-#_(slogger/error-message (:chan-log @logger-props) "test")
-#_(slogger/debug-message (:chan-log @logger-props) "test")
-#_(slogger/server-message (:chan-log @logger-props) "test")
-
-;; test server query
-#_(put! (:chan-query @search-props) "wi")
+;; (swap! navbar-props
+;;       update-in [:items 3 :items] conj {:name (str "Another Action" " " (rand-int 100)) :url "#"})

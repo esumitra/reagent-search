@@ -25,4 +25,4 @@ goog.addDependency("../reagent_search/simple.js", ['reagent_search.simple'], ['r
 goog.addDependency("../reagent_search/solr.js", ['reagent_search.solr'], ['cljs.core', 'reagent_search.logger', 'cljs.core.async', 'reagent_search.utils', 'clojure.string']);
 goog.addDependency("../reagent_search/search.js", ['reagent_search.search'], ['reagent.core', 'reagent_search.solr', 'cljs.core', 'reagent_search.logger', 'cljs.core.async', 'reagent_search.wiki', 'reagent_search.utils', 'clojure.string']);
 goog.addDependency("../reagent_search/navbar.js", ['reagent_search.navbar'], ['reagent.core', 'cljs.core', 'cljs.core.async', 'clojure.string']);
-goog.addDependency("../reagent_search/core.js", ['reagent_search.core'], ['reagent_search.simple', 'reagent.core', 'cljs.core', 'reagent_search.logger', 'cljs.core.async', 'reagent_search.search', 'clojure.string', 'reagent_search.navbar']);
+goog.addDependency("../reagent_search/core.js", ['reagent_search.core'], ['reagent_search.simple', 'reagent.core', 'cljs.core', 'reagent_search.logger', 'cljs.core.async', 'reagent_search.utils', 'reagent_search.search', 'clojure.string', 'reagent_search.navbar']);

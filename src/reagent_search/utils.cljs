@@ -5,6 +5,8 @@
             [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST]]))
 
+(enable-console-print!)
+
 ;; see http://catamorphic.wordpress.com/2012/03/02/generating-a-random-uuid-in-clojurescript/
 ;; and http://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29
 (defn uuid
@@ -48,3 +50,24 @@
       13 :enter
       27 :esc
       keycode)))
+
+(defn mount-component
+  "mounts the component cmp with properties props at dom-id
+  e.g., (mount-component maze1.logger/logger-coponent myprop \"logger\")"
+  [cmp props dom-id]
+  (reagent/render
+    [cmp props]
+    (.getElementById js/document dom-id)))
+
+(defn open-new-tab
+  "opens url in new tab"
+  [url]
+  (js/open url))
+
+(defn open-wiki-page
+  "opens wiki page in for term in new tab"
+  [term]
+  (let [esc-term (clojure.string/replace term #"\s" "_")
+        url (str "http://en.wikipedia.org/wiki/" esc-term)]
+    (println "url:" url)
+    (open-new-tab url)))

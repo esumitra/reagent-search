@@ -30,7 +30,8 @@
    (let [sel (<! chan-selecteditems)]
      (reset! ref-textvalue sel)
      (reset! ref-items [])
-     (slogger/info-message chan-log (str "selected value:" sel)))
+     (slogger/info-message chan-log (str "selected value:" sel))
+     (utils/open-wiki-page sel))
    (recur)))
 
 (defn- handle-autocomplete-focus
@@ -57,19 +58,17 @@
   the number of items rendered is limited to size items"
   [size itemsref textvalue chan-selecteditems chan-focus chan-log]
   (let [ref-focus-item (atom -1)]
-        (handle-autocompleteitemselected chan-selecteditems itemsref textvalue chan-log)
-        (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
+    (handle-autocompleteitemselected chan-selecteditems itemsref textvalue chan-log)
+    (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
     (fn []
       (if-not (empty? @itemsref)
         (do
-        ;; (handle-autocompleteitemselected chan-selecteditems itemsref textvalue)
-        ;; (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
           (reset! ref-focus-item -1)
-        [:div.open.dropdown-toggle {:data-toggle "dropdown"}
-         [:ul.dropdown-menu
-          {:role "menu"}
-          (for [item (take size @itemsref)]
-            ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems chan-focus item ref-focus-item])]])
+          [:div.open.dropdown-toggle {:data-toggle "dropdown"}
+           [:ul.dropdown-menu
+            {:role "menu"}
+            (for [item (take size @itemsref)]
+              ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems chan-focus item ref-focus-item])]])
         [:div.close]))))
 
 ;;; search input box and component
@@ -129,18 +128,18 @@
        nil))
    (recur)))
 
-(defn- search-component
+(defn search-component
   "renders the search input box"
   [props]
-  (let [chan-query (chan)
-        chan-textvalue (chan)
-        chan-keys (chan)
-        chan-sampler (chan (sliding-buffer 1))
+  (let [chan-query (chan) ;; sampled text term that is used for ajax wiki API calls
+        chan-textvalue (chan) ;; channel to hold text value from input box
+        chan-keys (chan) ;; channel to store individual keys to respond to keys like return and tab
+        chan-sampler (chan (sliding-buffer 1)) ;; channel used to hold current value of text; since this buffer is of size 1, only the most recent value is stored in this channel
         textvalue (atom "")
         chan-log (:chan-log props)
-        autocomplete-items (atom [])
-        chan-selecteditems (chan)
-        chan-focus (chan)]
+        autocomplete-items (atom []) ;; list of autocomplete items which will be populated by ajax call
+        chan-selecteditems (chan) ;; channel for current selected item
+        chan-focus (chan)] ;; channel for current item focused
     (handle-textvaluestream chan-textvalue chan-sampler chan-log textvalue)
     (handle-samplerstream chan-sampler chan-query chan-log (:sample-timeout-ms props))
     (handle-querystream chan-query chan-log autocomplete-items)

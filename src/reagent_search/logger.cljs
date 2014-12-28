@@ -42,7 +42,7 @@
 
 ;; logger has a local state that contains
 ;; all the messages logged so far
-(defn- logger-component
+(defn logger-component
   "renders a logger component that logs messages from a log channel
   :chan-log log channel
   :height height of log panel"
@@ -63,10 +63,3 @@
          [:div.panel-body.logger
           (for [m @messages]
             ^{:key (utils/uuid)} [display-message m])]]]])))
-
-(defn mount-logger
-  "mounts the logger component with data props at dom-id"
-  [dom-id props]
-  (reagent/render-component
-   [logger-component props]
-   (.getElementById js/document dom-id)))
