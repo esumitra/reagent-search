@@ -16,8 +16,10 @@
   [chan-preview ref-title ref-content]
   (go-loop
    []
-   (let [term (<! chan-preview)]
-     (reset! ref-title term))
+   (let [term (<! chan-preview)
+         content (<! (wiki/get-term-summary term))]
+     (reset! ref-title term)
+     (reset! ref-content content))
    (recur)))
 
 ;; pass in publish que
@@ -32,7 +34,7 @@
         [:div.panel.panel-default
          [:div.panel-heading
           [:h3.panel-title @title]]
-         [:div.panel-body @content]]))))
+         [:div.panel-body {:dangerouslySetInnerHTML (js-obj "__html" @content)}]]))))
 
 ;;; autocomplete panel
 (defn- autocomplete-item

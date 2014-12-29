@@ -9,7 +9,17 @@
    :format "json"
    :search nil})
 
+(def wiki-summary-params
+  {:action "parse"
+   :format "json"
+   :section "0"
+   :prop "text"
+   :page nil})
+
 (def wiki-autocomplete-url
+  "http://en.wikipedia.org/w/api.php")
+
+(def wiki-summary-url
   "http://en.wikipedia.org/w/api.php")
 
 (defn get-autocomplete-terms
@@ -22,4 +32,17 @@
                (println "wiki-resp:" rj)
                (second rj))
              ["error"])
+          chan-result)))
+
+(defn get-term-summary
+  "returns a channel that will contain the wiki summary for input term"
+  [term]
+  (let [parms (merge wiki-summary-params {:page term})
+        chan-result (utils/ajax-get wiki-summary-url parms)]
+    (map< #(if (:success %)
+             (let [rj (:response %)
+                   resp-map (js->clj rj)
+                   content-html (get-in resp-map ["parse" "text" "*"])]
+               content-html)
+             "server error")
           chan-result)))
