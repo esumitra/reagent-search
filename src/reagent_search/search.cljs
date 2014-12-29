@@ -8,20 +8,24 @@
             [reagent-search.solr :as solr]
             [reagent-search.wiki :as wiki]))
 
+(enable-console-print!)
+
 ;;; preview panel
 (defn- handle-preview-item
   "gets summary preview for selected item from wiki"
   [chan-preview ref-title ref-content]
-  )
+  (go-loop
+   []
+   (let [term (<! chan-preview)]
+     (reset! ref-title term))
+   (recur)))
 
 ;; pass in publish que
 (defn- preview-component
   "renders preview panel"
-  [pub-q chan-log]
+  [chan-preview chan-log]
   (let [title (atom "my title here") #_(atom nil)
-        content (atom "my content here") #_(atom nil)
-        chan-preview (chan 1)
-        #_(sub pub-q 1 chan-preview)]
+        content (atom "my content here") #_(atom nil)]
     (handle-preview-item chan-preview title content)
     (fn []
       (if-not (nil? @title)
@@ -33,8 +37,8 @@
 ;;; autocomplete panel
 (defn- autocomplete-item
   "renders a single autocomplete item in list"
-  [chan-selecteditems chan-focus item focus-item]
-  [:li
+  [chan-selecteditems chan-current-suggestion item focus-item]
+  [:li {:on-focus #(put! chan-current-suggestion item)}
    [:a {
         :href ""
         :on-click #(put! chan-selecteditems item)}
@@ -45,7 +49,7 @@
   1. logging selected item
   2. resetting the text input value
   3. removing the autocomplete panel
-  4. logs the selected component"
+  4. opens the wiki page for selected item in a new tab "
   [chan-selecteditems ref-items ref-textvalue chan-log]
   (go-loop
    []
@@ -78,7 +82,7 @@
   "renders the autocomplete component given a list of items to display
   and a selected item channel
   the number of items rendered is limited to size items"
-  [size itemsref textvalue chan-selecteditems chan-focus chan-log]
+  [size itemsref textvalue chan-selecteditems chan-focus chan-current-suggestion chan-log]
   (let [ref-focus-item (atom -1)]
     (handle-autocompleteitemselected chan-selecteditems itemsref textvalue chan-log)
     (handle-autocomplete-focus chan-focus itemsref ref-focus-item)
@@ -90,7 +94,7 @@
            [:ul.dropdown-menu
             {:role "menu"}
             (for [item (take size @itemsref)]
-              ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems chan-focus item ref-focus-item])]])
+              ^{:key (utils/uuid)} [autocomplete-item chan-selecteditems chan-current-suggestion item ref-focus-item])]])
         [:div.close]))))
 
 ;;; search input box and component
@@ -153,7 +157,8 @@
 (defn search-component
   "renders the search input box"
   [props]
-  (let [chan-query (chan) ;; sampled text term that is used for ajax wiki API calls
+  (let [chan-current-suggestion (chan 1)
+        chan-query (chan) ;; sampled text term that is used for ajax wiki API calls
         chan-textvalue (chan) ;; channel to hold text value from input box
         chan-keys (chan) ;; channel to store individual keys to respond to keys like return and tab
         chan-sampler (chan (sliding-buffer 1)) ;; channel used to hold current value of text; since this buffer is of size 1, only the most recent value is stored in this channel
@@ -176,9 +181,9 @@
           :on-change #(put! chan-textvalue (-> % .-target .-value))
           :on-key-up #(put! chan-keys (-> % .-which))}]
         [:span.input-group-addon.glyphicon.glyphicon-search]
-        [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus chan-log]]
+        [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus chan-current-suggestion chan-log]]
        [:div.top-space200
-        [preview-component nil chan-log]]])))
+        [preview-component chan-current-suggestion chan-log]]])))
 
 ;; how to model behavior of search results?
 ;; typeahead component sends search query message to search-query channel
