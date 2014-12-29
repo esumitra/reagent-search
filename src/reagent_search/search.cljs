@@ -1,12 +1,34 @@
 (ns reagent-search.search
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [clojure.string :as string]
-            [cljs.core.async :refer [put! chan <! timeout sliding-buffer]]
+            [cljs.core.async :refer [put! chan <! timeout sliding-buffer pub sub]]
             [reagent.core :as reagent :refer [atom]]
             [reagent-search.utils :as utils]
             [reagent-search.logger :as slogger]
             [reagent-search.solr :as solr]
             [reagent-search.wiki :as wiki]))
+
+;;; preview panel
+(defn- handle-preview-item
+  "gets summary preview for selected item from wiki"
+  [chan-preview ref-title ref-content]
+  )
+
+;; pass in publish que
+(defn- preview-component
+  "renders preview panel"
+  [pub-q chan-log]
+  (let [title (atom "my title here") #_(atom nil)
+        content (atom "my content here") #_(atom nil)
+        chan-preview (chan 1)
+        #_(sub pub-q 1 chan-preview)]
+    (handle-preview-item chan-preview title content)
+    (fn []
+      (if-not (nil? @title)
+        [:div.panel.panel-default
+         [:div.panel-heading
+          [:h3.panel-title @title]]
+         [:div.panel-body @content]]))))
 
 ;;; autocomplete panel
 (defn- autocomplete-item
@@ -145,15 +167,18 @@
     (handle-querystream chan-query chan-log autocomplete-items)
     (handle-keystream chan-keys chan-focus chan-log textvalue autocomplete-items)
     (fn[]
-      [:div.input-group
-       [:input.form-control
-        {:type "text"
-         :placeholder (:placeholder-text props)
-         :value @textvalue
-         :on-change #(put! chan-textvalue (-> % .-target .-value))
-         :on-key-up #(put! chan-keys (-> % .-which))}]
-       [:span.input-group-addon.glyphicon.glyphicon-search]
-       [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus chan-log]])))
+      [:div
+       [:div.input-group
+        [:input.form-control
+         {:type "text"
+          :placeholder (:placeholder-text props)
+          :value @textvalue
+          :on-change #(put! chan-textvalue (-> % .-target .-value))
+          :on-key-up #(put! chan-keys (-> % .-which))}]
+        [:span.input-group-addon.glyphicon.glyphicon-search]
+        [autocomplete-component (:autocomplete-size props) autocomplete-items textvalue chan-selecteditems chan-focus chan-log]]
+       [:div.top-space200
+        [preview-component nil chan-log]]])))
 
 ;; how to model behavior of search results?
 ;; typeahead component sends search query message to search-query channel
