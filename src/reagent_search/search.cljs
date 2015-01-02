@@ -26,8 +26,8 @@
 (defn- preview-component
   "renders preview panel"
   [chan-preview chan-log]
-  (let [title (atom "my title here") #_(atom nil)
-        content (atom "my content here") #_(atom nil)]
+  (let [title #_(atom "my title here") (atom nil)
+        content #_(atom "my content here") (atom nil)]
     (handle-preview-item chan-preview title content)
     (fn []
       (if-not (nil? @title)

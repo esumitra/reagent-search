@@ -27,4 +27,4 @@
                 :output-to "reagent_search.min.js"
                 :output-dir "out-min"
                 :optimizations :advanced
-                :source-map "maze1.min.js.map"}}]})
+                :source-map "reagent_search.min.js.map"}}]})
